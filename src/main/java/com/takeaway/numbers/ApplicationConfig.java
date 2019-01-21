@@ -4,15 +4,29 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Map;
-
 @Configuration
 @EnableConfigurationProperties
 @ConfigurationProperties
 public class ApplicationConfig {
-    private Map<String, Map<String, String>> serviceInstances;
-    private String defaultServerInstance;
+    private String serverHost;
+    private Integer serverPort;
     private String clientConnectSleep;
+
+    public String getServerHost() {
+        return serverHost;
+    }
+
+    public void setServerHost(String serverHost) {
+        this.serverHost = serverHost;
+    }
+
+    public Integer getServerPort() {
+        return serverPort;
+    }
+
+    public void setServerPort(Integer serverPort) {
+        this.serverPort = serverPort;
+    }
 
     public String getClientConnectSleep() {
         return clientConnectSleep;
@@ -20,21 +34,5 @@ public class ApplicationConfig {
 
     public void setClientConnectSleep(String clientConnectSleep) {
         this.clientConnectSleep = clientConnectSleep;
-    }
-
-    public Map<String, Map<String, String>> getServiceInstances() {
-        return serviceInstances;
-    }
-
-    public void setServiceInstances(Map<String, Map<String, String>> serviceInstances) {
-        this.serviceInstances = serviceInstances;
-    }
-
-    public String getDefaultServerInstance() {
-        return defaultServerInstance;
-    }
-
-    public void setDefaultServerInstance(String defaultServerInstance) {
-        this.defaultServerInstance = defaultServerInstance;
     }
 }
