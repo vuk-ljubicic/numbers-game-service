@@ -31,7 +31,7 @@ public class EventReader implements Runnable {
         while (true) {
             try {
                 Event event = (Event) inputStream.readObject();
-                event.setStreamed(true);
+                event.setShouldDistribute(false);
                 eventStore.getEvents().addFirst(event);
             } catch (IOException | ClassNotFoundException e) {
                 log.error(e.getMessage(), e);

@@ -31,9 +31,9 @@ public class EventWriter implements Runnable {
         while (true) {
             try {
                 Event event = (Event) eventStore.getEvents().peekLast();
-                if (!event.isStreamed()) {
+                if (event.isShouldDistribute()) {
                     outputStream.writeObject(event);
-                    event.setStreamed(true);
+                    event.setShouldDistribute(false);
                 }
             } catch (IOException e) {
                 log.error(e.getMessage(), e);

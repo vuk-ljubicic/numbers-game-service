@@ -19,4 +19,8 @@ public class EventStore {
     public void setEvents(LinkedBlockingDeque<Object> events) {
         this.events = events;
     }
+
+    public void removeAll(){
+        events.clear();
+    }
 }

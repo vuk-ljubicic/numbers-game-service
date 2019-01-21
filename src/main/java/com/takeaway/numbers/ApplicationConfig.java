@@ -11,6 +11,15 @@ public class ApplicationConfig {
     private String serverHost;
     private Integer serverPort;
     private String clientConnectSleep;
+    private String startingPlayer;
+
+    public String getStartingPlayer() {
+        return startingPlayer;
+    }
+
+    public void setStartingPlayer(String startingPlayer) {
+        this.startingPlayer = startingPlayer;
+    }
 
     public String getServerHost() {
         return serverHost;
