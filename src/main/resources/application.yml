@@ -1,0 +1,10 @@
+serviceInstances:
+  instance1:
+    host: localhost
+    port: 8080
+    type: client
+  instance2:
+    host: localhost
+    port: 8081
+    type: server
+clientConnectSleep: 1000
