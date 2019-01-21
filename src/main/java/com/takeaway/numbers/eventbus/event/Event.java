@@ -1,4 +1,4 @@
-package com.takeaway.numbers.eventbus;
+package com.takeaway.numbers.eventbus.event;
 
 public abstract class Event {
     protected boolean isStreamed;

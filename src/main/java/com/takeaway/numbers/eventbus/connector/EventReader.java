@@ -1,6 +1,6 @@
 package com.takeaway.numbers.eventbus.connector;
 
-import com.takeaway.numbers.eventbus.Event;
+import com.takeaway.numbers.eventbus.event.Event;
 import com.takeaway.numbers.eventbus.EventStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

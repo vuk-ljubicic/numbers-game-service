@@ -20,22 +20,21 @@ public class Connector {
     private ServerSideConnectorWorker serverSideConnectorWorker;
     @Autowired
     private ApplicationCache applicationCache;
-    private String instanceType;
     private ExecutorService executor;
+    private String instanceType;
 
-    public Connector(String instanceType) {
+    public Connector(String instanceType, ExecutorService executor) {
         this.instanceType = instanceType;
-        executor = Executors.newFixedThreadPool(2);
     }
 
     @PostConstruct
     public void init() {
-        if (instanceType != null && instanceType.equals(SERVICE_INSTANCE_SERVER)) {
-            applicationCache.setServiceInstanceType(SERVICE_INSTANCE_SERVER);
+        if (instanceType != null && instanceType.equals(SERVICE_INSTANCE_CLIENT)) {
+            applicationCache.setServiceInstanceType(SERVICE_INSTANCE_CLIENT);
             serverSideConnectorWorker.setExecutor(executor);
             executor.execute(serverSideConnectorWorker);
         } else {
-            applicationCache.setServiceInstanceType(SERVICE_INSTANCE_CLIENT);
+            applicationCache.setServiceInstanceType(SERVICE_INSTANCE_SERVER);
             clientSideConnectorWorker.setExecutor(executor);
             executor.execute(clientSideConnectorWorker);
         }
