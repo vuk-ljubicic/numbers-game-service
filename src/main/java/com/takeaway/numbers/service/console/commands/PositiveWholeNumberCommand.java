@@ -5,6 +5,7 @@ import com.takeaway.numbers.eventbus.EventStore;
 import com.takeaway.numbers.eventbus.Producer;
 import com.takeaway.numbers.eventbus.event.NumberGeneratedEvent;
 import com.takeaway.numbers.service.console.ConsoleService;
+import com.takeaway.numbers.service.number.NumberService;
 
 import java.util.regex.Matcher;
 
@@ -13,7 +14,7 @@ public class PositiveWholeNumberCommand extends Command {
 
     @Override
     public void execute(Producer producer, Matcher matcher, ConsoleService consoleService,
-                        ApplicationCache applicationCache, EventStore eventStore) {
+                        ApplicationCache applicationCache, EventStore eventStore, NumberService numberService) {
         Integer positiveWholeNumber = Integer.valueOf(matcher.group(1));
         producer.produce(new NumberGeneratedEvent(applicationCache.getCurrentNumber(), 0,
                 positiveWholeNumber, applicationCache.getServiceInstance()));

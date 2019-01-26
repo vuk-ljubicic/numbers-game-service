@@ -1,5 +1,6 @@
 package com.takeaway.numbers.eventbus;
 
+import com.takeaway.numbers.ApplicationConfig;
 import com.takeaway.numbers.cache.ApplicationCache;
 import com.takeaway.numbers.eventbus.event.AutoPlaySelectedEvent;
 import com.takeaway.numbers.eventbus.event.Event;
@@ -29,6 +30,8 @@ public class Consumer {
     private ApplicationCache applicationCache;
     @Autowired
     private ConsoleService consoleService;
+    @Autowired
+    private ApplicationConfig applicationConfig;
 
     public Consumer(ExecutorService executor) {
         this.executor = executor;
@@ -50,10 +53,10 @@ public class Consumer {
 
     private void initHandlers() {
         handlers = new ConcurrentHashMap<>();
-        handlers.put(AutoPlaySelectedEvent.class,
-                new AutoPlaySelectedEventHandler(applicationCache, producer, this, consoleService));
-        handlers.put(ManualPlaySelectedEvent.class,
-                new ManualPlaySelectedEventHandler(applicationCache, producer, this, consoleService));
+        handlers.put(AutoPlaySelectedEvent.class, new AutoPlaySelectedEventHandler(applicationCache, producer,
+                this, consoleService, null, applicationConfig));
+        handlers.put(ManualPlaySelectedEvent.class, new ManualPlaySelectedEventHandler(applicationCache, producer,
+                this, consoleService, null, applicationConfig));
     }
 
     private void initConsumerWorker() {
@@ -61,14 +64,22 @@ public class Consumer {
             while (true) {
                 try {
                     Event event = (Event) eventStore.getEvents().peekLast();
-                    Handler handler = handlers.get(event.getClass());
-                    if (handler != null) {
-                        handler.handle(event.getClass().cast(event));
-                        if (!event.isShouldDistribute()) {
-                            eventStore.getEvents().removeLast();
+                    if (event != null) {
+                        Handler handler = handlers.get(event.getClass());
+                        if (handler != null) {
+                            if (!event.isHandledLocally()) {
+                                handler.handle(event.getClass().cast(event));
+                                event.setHandledLocally(true);
+                            }
+                            if (!event.isShouldDistribute()) {
+                                eventStore.getEvents().removeLast();
+                            }
+                        } else {
+                            event = (Event)eventStore.getEvents().removeLast();
+                            eventStore.getEvents().addFirst(event);
                         }
                     }
-                } catch(Exception e){
+                } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
             }

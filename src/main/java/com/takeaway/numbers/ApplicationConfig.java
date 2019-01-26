@@ -12,6 +12,24 @@ public class ApplicationConfig {
     private Integer serverPort;
     private String clientConnectSleep;
     private String startingPlayer;
+    private Integer randomPositiveNumberLow;
+    private Integer randomPositiveNumberHigh;
+
+    public Integer getRandomPositiveNumberLow() {
+        return randomPositiveNumberLow;
+    }
+
+    public void setRandomPositiveNumberLow(Integer randomPositiveNumberLow) {
+        this.randomPositiveNumberLow = randomPositiveNumberLow;
+    }
+
+    public Integer getRandomPositiveNumberHigh() {
+        return randomPositiveNumberHigh;
+    }
+
+    public void setRandomPositiveNumberHigh(Integer randomPositiveNumberHigh) {
+        this.randomPositiveNumberHigh = randomPositiveNumberHigh;
+    }
 
     public String getStartingPlayer() {
         return startingPlayer;

@@ -5,6 +5,7 @@ import com.takeaway.numbers.eventbus.EventStore;
 import com.takeaway.numbers.eventbus.Producer;
 import com.takeaway.numbers.eventbus.event.NumberGeneratedEvent;
 import com.takeaway.numbers.service.console.commands.*;
+import com.takeaway.numbers.service.number.NumberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,9 +33,18 @@ public class ConsoleService {
     private ApplicationCache applicationCache;
     @Autowired
     private EventStore eventStore;
+    private NumberService numberService;
 
     public ConsoleService() {
         scanner = new Scanner(System.in);
+    }
+
+    public NumberService getNumberService() {
+        return numberService;
+    }
+
+    public void setNumberService(NumberService numberService) {
+        this.numberService = numberService;
     }
 
     public synchronized void startGame() {
@@ -96,7 +106,7 @@ public class ConsoleService {
             Pattern pattern = Pattern.compile(command.getRegex());
             Matcher matcher = pattern.matcher(consoleInput);
             if (matcher.find()) {
-                command.execute(producer, matcher, this, applicationCache, eventStore);
+                command.execute(producer, matcher, this, applicationCache, eventStore, numberService);
                 result = true;
             }
         }
