@@ -26,17 +26,47 @@ public class ConsoleService {
     public static final String WINNER_MESSAGE = "%s Won! Enter R (Restart the game) or Q (Quit the game):%n";
     public static final String UNSUPPORTED_VALUE_ENTERED = "Unsupported value entered, try again:%n";
     public static final String WAITING_FOR_PLAYER_TO_START = "Waiting for player %s to start%n";
-    private Scanner scanner;
+    protected Scanner scanner;
     @Autowired
-    private Producer producer;
+    protected Producer producer;
     @Autowired
-    private ApplicationCache applicationCache;
+    protected ApplicationCache applicationCache;
     @Autowired
-    private EventStore eventStore;
-    private NumberService numberService;
+    protected EventStore eventStore;
+    protected NumberService numberService;
 
     public ConsoleService() {
         scanner = new Scanner(System.in);
+    }
+
+    public ConsoleService(Producer producer, ApplicationCache applicationCache, EventStore eventStore) {
+        this.producer = producer;
+        this.applicationCache = applicationCache;
+        this.eventStore = eventStore;
+    }
+
+    public Producer getProducer() {
+        return producer;
+    }
+
+    public void setProducer(Producer producer) {
+        this.producer = producer;
+    }
+
+    public ApplicationCache getApplicationCache() {
+        return applicationCache;
+    }
+
+    public void setApplicationCache(ApplicationCache applicationCache) {
+        this.applicationCache = applicationCache;
+    }
+
+    public EventStore getEventStore() {
+        return eventStore;
+    }
+
+    public void setEventStore(EventStore eventStore) {
+        this.eventStore = eventStore;
     }
 
     public NumberService getNumberService() {
@@ -47,7 +77,7 @@ public class ConsoleService {
         this.numberService = numberService;
     }
 
-    public synchronized void startGame() {
+    public void startGame() {
         System.out.printf(SUPPORTED_GAME_MODES);
         System.out.printf(MODE_A);
         System.out.printf(MODE_M);
@@ -61,16 +91,20 @@ public class ConsoleService {
         }
     }
 
-    public synchronized void addNumber() {
+    public void addNumber() {
         System.out.printf(ENTER_NUMBER_TO_ADD, applicationCache.getCurrentNumber());
-        String consoleInput = scanner.nextLine();
+        String consoleInput = consoleInput();
         while (!matchAndExecute(new Command[]{new NumberToAddCommand()}, consoleInput)) {
             System.out.printf(UNSUPPORTED_VALUE_ENTERED);
-            consoleInput = scanner.nextLine();
+            consoleInput = consoleInput();
         }
     }
 
-    public synchronized void enterPositiveWholeNumber() {
+    public String consoleInput(){
+        return scanner.nextLine();
+    }
+
+    public void enterPositiveWholeNumber() {
         System.out.printf(ENTER_POSITIVE_WHOLE_NUMBER);
         String consoleInput = scanner.nextLine();
         while (!matchAndExecute(new Command[]{new PositiveWholeNumberCommand()}, consoleInput)) {
@@ -79,13 +113,13 @@ public class ConsoleService {
         }
     }
 
-    public synchronized void numberGenerated(NumberGeneratedEvent numberGeneratedEvent) {
+    public void numberGenerated(NumberGeneratedEvent numberGeneratedEvent) {
         System.out.printf(NUMBER_GENERATED, numberGeneratedEvent.getResultingNumber(),
                 numberGeneratedEvent.getInstanceType(), numberGeneratedEvent.getPreviousNumber(),
                 numberGeneratedEvent.getAddedNumber());
     }
 
-    public synchronized void winner(NumberGeneratedEvent numberGeneratedEvent) {
+    public void winner(NumberGeneratedEvent numberGeneratedEvent) {
         System.out.printf(WINNER_MESSAGE, numberGeneratedEvent.getInstanceType().
                 equals(applicationCache.getServiceInstance()) ? "You" : numberGeneratedEvent.getInstanceType());
         String consoleInput = scanner.nextLine();
@@ -96,7 +130,7 @@ public class ConsoleService {
         }
     }
 
-    public synchronized void waitingForPlayerToStart() {
+    public void waitingForPlayerToStart() {
         System.out.printf(WAITING_FOR_PLAYER_TO_START, applicationCache.getPeerInstance());
     }
 

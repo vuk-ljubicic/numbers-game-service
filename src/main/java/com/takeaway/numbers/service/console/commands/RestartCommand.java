@@ -14,8 +14,7 @@ public class RestartCommand extends Command{
     @Override
     public void execute(Producer producer, Matcher matcher, ConsoleService consoleService,
                         ApplicationCache applicationCache, EventStore eventStore, NumberService numberService) {
-        eventStore.removeAll();
-        applicationCache.setCurrentNumber(0);
+        applicationCache.setCurrentNumber(-1);
         consoleService.startGame();
     }
 

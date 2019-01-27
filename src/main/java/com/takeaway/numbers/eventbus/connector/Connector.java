@@ -33,18 +33,18 @@ public class Connector {
 
     @PostConstruct
     public void init() {
-        if (instanceType != null && instanceType.equals(SERVICE_INSTANCE_SERVER)) {
-            applicationCache.setServiceInstance(SERVICE_INSTANCE_SERVER);
-            applicationCache.setPeerInstance(SERVICE_INSTANCE_CLIENT);
-            applicationCache.setStartingGame(applicationConfig.getStartingPlayer().equals(SERVICE_INSTANCE_SERVER));
-            serverSideConnectorWorker.setExecutor(executor);
-            executor.execute(serverSideConnectorWorker);
-        } else {
+        if (instanceType != null && instanceType.equals(SERVICE_INSTANCE_CLIENT)) {
             applicationCache.setServiceInstance(SERVICE_INSTANCE_CLIENT);
             applicationCache.setPeerInstance(SERVICE_INSTANCE_SERVER);
             applicationCache.setStartingGame(applicationConfig.getStartingPlayer().equals(SERVICE_INSTANCE_CLIENT));
             clientSideConnectorWorker.setExecutor(executor);
             executor.execute(clientSideConnectorWorker);
+        } else {
+            applicationCache.setServiceInstance(SERVICE_INSTANCE_SERVER);
+            applicationCache.setPeerInstance(SERVICE_INSTANCE_CLIENT);
+            applicationCache.setStartingGame(applicationConfig.getStartingPlayer().equals(SERVICE_INSTANCE_SERVER));
+            serverSideConnectorWorker.setExecutor(executor);
+            executor.execute(serverSideConnectorWorker);
         }
     }
 }

@@ -2,25 +2,27 @@ package com.takeaway.numbers.eventbus;
 
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.LinkedList;
 
 @Component
 public class EventStore {
-    private LinkedBlockingDeque<Object> events;
+    private LinkedList<Object> events;
 
     public EventStore() {
-        events = new LinkedBlockingDeque<>();
+        events = new LinkedList<>();
     }
 
-    public LinkedBlockingDeque<Object> getEvents() {
+    public LinkedList<Object> getEvents() {
         return events;
     }
 
-    public void setEvents(LinkedBlockingDeque<Object> events) {
+    public void setEvents(LinkedList<Object> events) {
         this.events = events;
     }
 
     public void removeAll(){
-        events.clear();
+        synchronized (events) {
+            events.clear();
+        }
     }
 }

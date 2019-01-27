@@ -21,20 +21,24 @@ import java.util.concurrent.ExecutorService;
 public class Consumer {
     private Logger log = LoggerFactory.getLogger(Consumer.class);
     private ExecutorService executor;
-    private Map<Class, Handler> handlers;
+    protected Map<Class, Handler> handlers;
     @Autowired
-    private EventStore eventStore;
+    protected EventStore eventStore;
     @Autowired
-    private Producer producer;
+    protected Producer producer;
     @Autowired
-    private ApplicationCache applicationCache;
+    protected ApplicationCache applicationCache;
     @Autowired
-    private ConsoleService consoleService;
+    protected ConsoleService consoleService;
     @Autowired
-    private ApplicationConfig applicationConfig;
+    protected ApplicationConfig applicationConfig;
 
     public Consumer(ExecutorService executor) {
         this.executor = executor;
+    }
+
+    public Consumer(){
+
     }
 
     public Map<Class, Handler> getHandlers() {
@@ -45,13 +49,61 @@ public class Consumer {
         this.handlers = handlers;
     }
 
+    public EventStore getEventStore() {
+        return eventStore;
+    }
+
+    public void setEventStore(EventStore eventStore) {
+        this.eventStore = eventStore;
+    }
+
+    public Producer getProducer() {
+        return producer;
+    }
+
+    public void setProducer(Producer producer) {
+        this.producer = producer;
+    }
+
+    public ApplicationCache getApplicationCache() {
+        return applicationCache;
+    }
+
+    public void setApplicationCache(ApplicationCache applicationCache) {
+        this.applicationCache = applicationCache;
+    }
+
+    public ConsoleService getConsoleService() {
+        return consoleService;
+    }
+
+    public void setConsoleService(ConsoleService consoleService) {
+        this.consoleService = consoleService;
+    }
+
+    public ApplicationConfig getApplicationConfig() {
+        return applicationConfig;
+    }
+
+    public void setApplicationConfig(ApplicationConfig applicationConfig) {
+        this.applicationConfig = applicationConfig;
+    }
+
+    public ExecutorService getExecutor() {
+        return executor;
+    }
+
+    public void setExecutor(ExecutorService executor) {
+        this.executor = executor;
+    }
+
     @PostConstruct
     public void init() {
         initHandlers();
         initConsumerWorker();
     }
 
-    private void initHandlers() {
+    public void initHandlers() {
         handlers = new ConcurrentHashMap<>();
         handlers.put(AutoPlaySelectedEvent.class, new AutoPlaySelectedEventHandler(applicationCache, producer,
                 this, consoleService, null, applicationConfig));
@@ -62,27 +114,38 @@ public class Consumer {
     private void initConsumerWorker() {
         executor.execute(() -> {
             while (true) {
-                try {
-                    Event event = (Event) eventStore.getEvents().peekLast();
-                    if (event != null) {
-                        Handler handler = handlers.get(event.getClass());
-                        if (handler != null) {
-                            if (!event.isHandledLocally()) {
-                                handler.handle(event.getClass().cast(event));
-                                event.setHandledLocally(true);
-                            }
-                            if (!event.isShouldDistribute()) {
-                                eventStore.getEvents().removeLast();
-                            }
-                        } else {
-                            event = (Event)eventStore.getEvents().removeLast();
-                            eventStore.getEvents().addFirst(event);
-                        }
-                    }
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
+               invokeHandler();
             }
         });
+    }
+
+    public void invokeHandler(){
+        try {
+            synchronized (eventStore.getEvents()) {
+                Event event = (Event) eventStore.getEvents().peekLast();
+                if (event != null) {
+                    Handler handler = handlers.get(event.getClass());
+                    if (handler != null) {
+                        if (!event.isHandledLocally()) {
+                            handler.handle(event.getClass().cast(event));
+                            event.setHandledLocally(true);
+                        }
+                        if (!event.isShouldDistribute()) {
+                            eventStore.getEvents().removeLast();
+                        }
+                    } else {
+                        event = (Event) eventStore.getEvents().removeLast();
+                        eventStore.getEvents().addFirst(event);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }
