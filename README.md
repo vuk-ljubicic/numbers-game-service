@@ -11,7 +11,7 @@
 # Short Overview
 
 Numbers Game Service is implemented using event driven architecture. In the center is simple event bus
-(located in com.takeaway.numbers.eventbus). Event bus transmits events (POJOs) between PLAYER1 (server) nad PLAYER2
+(located in com.takeaway.numbers.eventbus). Event bus transmits events (POJOs) between PLAYER1 (server) and PLAYER2
 (client) in asynchronous way, using single tcp connection.
 Business logic is encapsulated in event handlers (located in com.takeaway.numbers.eventbus.handler) and service classes
 (located in com.takeaway.numbers.service).
